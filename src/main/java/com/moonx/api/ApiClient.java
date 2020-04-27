@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.moonx.dto.request.*;
 import com.moonx.dto.response.ApiResponse;
 import com.moonx.enums.RequestType;
+import com.moonx.ws.Store;
+import com.moonx.ws.Subscription;
+import com.moonx.ws.WebSocketSession;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,10 +16,13 @@ public class ApiClient {
 
     final String businessNo;
     final String apiSecret;
+    private WebSocketSession session;
+    private Store store = new Store();
 
     public ApiClient(String businessNo, String apiSecret){
         this.businessNo = businessNo;
         this.apiSecret = apiSecret;
+        this.session = new WebSocketSession(businessNo, apiSecret);
     }
 
     public ApiResponse<String> createNewOrder(NewOrderRequest newOrderRequest) throws IOException {
@@ -57,6 +63,14 @@ public class ApiClient {
 
     public File tradeDataAsXLSX(TradeDownloadRequest tradeDownloadRequest) throws IOException {
         return new ApiUtil().sendRequest_(RequestType.TRADE_DOWNLOAD_XLSX, tradeDownloadRequest, this.businessNo, this.apiSecret);
+    }
+
+    public void subscribe(Subscription subscription) {
+        session.subscribe(subscription, store);
+    }
+
+    public synchronized void unSubscribe(Subscription subscription) {
+        session.unSubscribe(subscription, store);
     }
 
     public static JSONObject depth(String symbol) throws IOException {

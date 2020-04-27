@@ -5,6 +5,8 @@ import com.moonx.dto.request.*;
 import com.moonx.enums.TimeInForce;
 import com.moonx.enums.TradeCoinFlag;
 import com.moonx.enums.TradeCoinType;
+import com.moonx.ws.StreamKey;
+import com.moonx.ws.Subscription;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.IOException;
@@ -15,10 +17,10 @@ public class Main {
     static final String API_SECRET = "API_SECRET";
 
     public static void main(String[] args) {
-
         try {
             publicApiTest();
             privateApiTest();
+            websocketTest();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -121,6 +123,12 @@ public class Main {
         //printResponse("File has been downloaded to :: " + client.tradeDataAsXLSX(tradeDownloadRequest_));
 
 
+    }
+
+    static void websocketTest() throws IOException {
+        /************************* Websocket **************************/
+        ApiClient client = new ApiClient(BUSINESS_NO, API_SECRET);
+        client.subscribe(new Subscription().streamKey(StreamKey.parse("stack@btc_usd")).throttleMillis(2000));
     }
 
 
